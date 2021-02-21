@@ -1,23 +1,77 @@
-import logo from './logo.svg';
 import './App.css';
+import React, {useState} from 'react'
+import Row from './components/row'
 
 function App() {
+  const [winningHm,setWinningHm] = useState({hor:{},ver:{},dig:{}})
+  const [rows,setRows] = useState([[0,1,2],[0,1,2],[0,1,2]])
+  const [exTurn,setExTurn] = useState(true)
+    const [winner,setWinner] = useState('')
+
+  const handleClick = (square) =>{
+    const newWrite = exTurn? 'X' : 'O'
+    console.log(newWrite)
+    let squares = rows
+    squares[square.rowIndex][square.col] = newWrite
+    setRows(squares)
+    checkWinning(square)
+  }
+
+  const checkWinning = (square) =>{
+    const shape = exTurn ? 'X' : 'O'
+   let checkHm = winningHm
+    if(!checkHm["hor"][square.rowIndex]){
+      checkHm["hor"][square.rowIndex] = {}
+      checkHm["hor"][square.rowIndex].i = 1
+        checkHm["hor"][square.rowIndex].firstShape = shape
+        checkHm["hor"][square.rowIndex]['winPossible'] = true
+    } else {
+        if (checkHm["hor"][square.rowIndex]['winPossible'] && checkHm["hor"][square.rowIndex].firstShape === shape){
+            checkHm["hor"][square.rowIndex].i++
+        } else {
+            checkHm["hor"][square.rowIndex]['winPossible'] = false
+        }
+        if(checkHm["hor"][square.rowIndex].i === 3){
+            winnerCall(shape)
+        }
+    }
+    if(!checkHm["ver"][square.col]){
+      checkHm["ver"][square.col] = {}
+      checkHm["ver"][square.col].i = 1
+        checkHm["ver"][square.col].firstShape = shape
+        checkHm["ver"][square.col]['winPossible'] = true
+    } else {
+        if (checkHm["ver"][square.col]['winPossible'] && checkHm["ver"][square.col].firstShape === shape){
+            checkHm["ver"][square.col].i++
+        } else {
+            checkHm["ver"][square.col]['winPossible'] = false
+        }
+        if(checkHm["ver"][square.col].i === 3){
+            winnerCall(shape)
+        }
+    }
+
+
+
+      setWinningHm(checkHm)
+    setExTurn(!exTurn)
+  }
+
+  const winnerCall = (shape)=>{
+      setWinner('the winner is ' + shape)
+    }
+
   return (
     <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
+      {rows.map((row,key)=><Row className='row'
+                                row={row}
+                                key={key}
+                                rowIndex={key}
+          onClick={handleClick}
+          />
+
+      )}
+      <h1>{winner}</h1>
     </div>
   );
 }
